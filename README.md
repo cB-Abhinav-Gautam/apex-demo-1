@@ -20,6 +20,19 @@ Infrastructure for the `apex-demo-stack` Apex stack.
 - VPC flow logs delivered to a CloudWatch log group.
 - The default security group locked down to no ingress and no egress.
 
+## Public IP addressing
+
+The subnet is public — it routes `0.0.0.0/0` to the internet gateway — but
+`map_public_ip_on_launch` is set to `false`. Auto-assigning public IPs to every
+instance in the subnet trips trivy `AWS-0164` (HIGH) and the stack pipeline's
+`scan` stage fails on it.
+
+Workloads that genuinely need inbound internet access should opt in explicitly:
+
+- set `associate_public_ip_address = true` on the specific instance or ENI, or
+- attach an Elastic IP, or
+- place an ALB/NLB in the public subnet and keep the workload private.
+
 ## Tagging
 
 Every resource carries the `owner` and `environment` tags required by the

@@ -21,8 +21,12 @@ module "vpc" {
   azs            = var.azs
   public_subnets = var.public_subnet_cidrs
 
-  # Public subnet: instances launched here receive a public IP.
-  map_public_ip_on_launch = true
+  # The subnet is public: it is routed to the internet gateway via the public
+  # route table. Public IPs are NOT auto-assigned at launch (trivy AWS-0164);
+  # workloads that need inbound internet access opt in explicitly, either with
+  # `associate_public_ip_address = true` on the instance/ENI, an Elastic IP,
+  # or by placing a load balancer in front.
+  map_public_ip_on_launch = false
 
   enable_dns_hostnames = true
   enable_dns_support   = true
